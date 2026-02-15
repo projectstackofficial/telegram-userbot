@@ -526,6 +526,6 @@ Built with ❤️ using:
 
 ⭐ Star this repo if you find it useful!
 
-[Report Bug](https://github.com/yourusername/telegram-userbot/issues) • [Request Feature](https://github.com/yourusername/telegram-userbot/issues)
+[Report Bug](https://github.com/projectstackofficial/telegram-userbot/issues) • [Request Feature](https://github.com/projectstackofficial/telegram-userbot/issues)
 
 </div>
