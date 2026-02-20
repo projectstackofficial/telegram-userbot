@@ -241,7 +241,22 @@ class TelegramUserbot:
         # Get current message
         current_msg = self._get_current_auto_reply_message()
         is_default = (current_msg == self.default_message)
-        msg_type = "default" if is_default else "time-based"
+        
+        # Check if temp mode is active
+        temp_state = self.db.get_temp_state(self.owner_id)
+        is_temp_active = temp_state and temp_state.temp_active
+        if temp_state and temp_state.temp_active and temp_state.temp_expiry:
+            # Check if temp mode is not expired
+            current_time = get_ist_now()
+            is_temp_active = current_time < temp_state.temp_expiry
+        
+        # Determine message type
+        if is_temp_active:
+            msg_type = "temp-mode"
+        elif is_default:
+            msg_type = "default"
+        else:
+            msg_type = "time-based"
         
         welcome = f"""
 🤖 **Smart Telegram Userbot**
