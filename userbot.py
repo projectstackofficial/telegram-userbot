@@ -390,14 +390,23 @@ Outside time rules, it uses your default message.
         
         # Get current message
         current_msg = self._get_current_auto_reply_message()
-        is_default = (current_msg == self.default_message)
         
-        # Check temp mode
+        # Check temp mode (with expiry check)
         temp_state = self.db.get_temp_state(self.owner_id)
         temp_info = ""
         msg_type = "Default"
+        is_temp_active = False
         
         if temp_state and temp_state.temp_active:
+            if temp_state.temp_expiry:
+                # Temp mode with expiry - check if not expired
+                current_time = get_ist_now()
+                is_temp_active = (current_time < temp_state.temp_expiry)
+            else:
+                # Temp mode without expiry - permanently active until manual reset
+                is_temp_active = True
+        
+        if is_temp_active:
             msg_type = f"Temp ({temp_state.temp_category})"
             temp_info = f"\n**Temp Mode:** 🟢 Active (`{temp_state.temp_category}`)"
         else:
@@ -440,13 +449,34 @@ Outside time rules, it uses your default message.
         
         current_msg = self._get_current_auto_reply_message()
         
+        # Check if temp mode is active (and not expired)
+        temp_state = self.db.get_temp_state(self.owner_id)
+        is_temp_active = False
+        
+        if temp_state and temp_state.temp_active:
+            if temp_state.temp_expiry:
+                # Temp mode with expiry - check if not expired
+                current_time = get_ist_now()
+                is_temp_active = (current_time < temp_state.temp_expiry)
+            else:
+                # Temp mode without expiry - permanently active until manual reset
+                is_temp_active = True
+        
+        # Determine message type based on priority: temp-mode > time-based > default
+        if is_temp_active:
+            msg_type = "temp-mode"
+        elif current_msg != self.default_message:
+            msg_type = "time-based"
+        else:
+            msg_type = "default"
+        
         response = f"""
 ✅ **Auto-reply ENABLED**
 
-**Current Message (Default):**
+**Current Message ({msg_type}):**
 `{current_msg}`
 
-The bot will now reply to messages when you're offline using your default message.
+The bot will now reply to messages when you're offline using your {'temp mode' if is_temp_active else 'default'} message.
 💡 Use `/customon` to enable time-based rules if needed.
         """
         
