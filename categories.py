@@ -102,6 +102,6 @@ def get_categories_help_text() -> str:
             if cat in CATEGORIES:
                 lines.append(f"• `{cat}` - {CATEGORIES[cat]}")
     
-    lines.append("\n*Note: These categories are read-only and used for time-based switching.*")
+    lines.append("\n**Note:** These categories are read-only and used for time-based switching.")
     
     return "\n".join(lines)
